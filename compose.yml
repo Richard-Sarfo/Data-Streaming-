@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:14-alpine
+    container_name: streaming-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_streaming
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_setup.sql:/docker-entrypoint-initdb.d/01-setup.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - streaming-network
+    command:
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_duration=on"
+
+  # Apache Spark Master Service
+  spark:
+    build:
+      context: .
+    container_name: realtime_spark
+    environment:
+      - SPARK_MODE=master
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ecommerce_streaming
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "8080:8080"   # Spark Web UI
+      - "7077:7077"   # Spark Master Port
+      - "4040:4040"   # Spark Application UI
+    volumes:
+      - .:/opt/spark/work-dir/
+      - ./csv_data:/opt/spark/work-dir/csv_data
+      - ./data:/opt/spark/work-dir/data
+      - ./output:/opt/spark/work-dir/output
+    networks:
+      - streaming-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+
+  # Application Service (Data Generator + Spark Job)
+
+volumes:
+  postgres_data:
+    driver: local
+  spark_data:
+    driver: local
+  spark_worker_data:
+    driver: local
+
+networks:
+  streaming-network:
+    driver: bridge

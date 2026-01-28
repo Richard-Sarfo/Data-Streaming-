@@ -1,0 +1,7 @@
+# PostgreSQL Connection Details
+
+host=postgres
+port=5432
+database=ecommerce_streaming
+user=postgres
+password=postgres

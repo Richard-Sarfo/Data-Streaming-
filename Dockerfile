@@ -1,0 +1,28 @@
+FROM spark:python3-java17
+
+USER root
+
+# Add Spark bin to PATH
+ENV PATH="/opt/spark/bin:${PATH}"
+ENV SPARK_HOME="/opt/spark"
+
+# Create python symlink (if needed - may already exist in image)
+# RUN ln -s /usr/bin/python3 /usr/bin/python@
+# Install Python dependencies
+RUN pip3 install --no-cache-dir \
+    faker \
+    psycopg2-binary \
+    pandas
+
+# Download PostgreSQL JDBC Driver
+RUN curl -o /opt/spark/jars/postgresql-42.7.1.jar \
+    https://jdbc.postgresql.org/download/postgresql-42.7.1.jar
+
+# Create working directories
+RUN mkdir -p /opt/spark/work-dir/csv_data \
+    /opt/spark/work-dir/output
+
+WORKDIR /opt/spark/work-dir
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"] 
