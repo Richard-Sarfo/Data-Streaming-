@@ -104,13 +104,6 @@ CREATE TABLE IF NOT EXISTS streaming.data_ingestion_audit (
 CREATE INDEX idx_audit_batch_id ON streaming.data_ingestion_audit(batch_id);
 CREATE INDEX idx_audit_created_at ON streaming.data_ingestion_audit(created_at);
 
--- Create role for the streaming application (optional, for security)
--- Uncomment and modify if using role-based access control
--- CREATE ROLE streaming_app WITH LOGIN PASSWORD 'your_secure_password';
--- GRANT USAGE ON SCHEMA streaming TO streaming_app;
--- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA streaming TO streaming_app;
--- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA streaming TO streaming_app;
-
 -- Grant permissions to public (for testing; restrict in production)
 GRANT USAGE ON SCHEMA streaming TO PUBLIC;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA streaming TO PUBLIC;
