@@ -7,6 +7,8 @@
 -- Connect to the new database
 -- \c ecommerce_streaming;
 
+BEGIN;
+
 -- Create schema for organizing tables
 CREATE SCHEMA IF NOT EXISTS streaming;
 
